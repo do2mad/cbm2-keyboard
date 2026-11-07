@@ -5,6 +5,7 @@
 PCB for the **CBM2 Keyboard**: a Raspberry Pi **Pico 2 W** or **YD-RP2040**, the 23-pin plug of the
 CBM-II keyboard, the socket for the cable to the Pico64 and – if you want to go wireless – room for a
 charger module and a LiPo cell. 56 × 62 mm, 2 layers, 1.6 mm, through-hole parts only.
+The PCB has a cut-out under the antenna of the Pico 2 W (better radio reception).
 
 | | |
 |---|---|

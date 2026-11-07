@@ -14,7 +14,7 @@ Erste Veröffentlichung / first public release.
 - **USB-Tastatur** am Computer (MiSTer, PC/Mac deutsch/US, Auswahl mit CE + F-Taste) und USB-Konsole.
 - **Akkubetrieb** mit Lademodul 4056, Stromsparen; **C= + F10** tippt Version und Versorgung.
 - Zwei Firmware-Dateien: `cbm2-keyboard_pico2w` (Pico 2 W) und `cbm2-keyboard_rp2040` (YD-RP2040 / Pico 1, nur Kabel; Akkuspannung über Teiler an GP26, am Kabel keine Spannungsanzeige).
-- Platine v1.0 (Gerber, Stückliste, Fotos in `hardware/`).
+- Platine v1.0 (Gerber, Stückliste, Fotos in `hardware/`). Nachtrag 07.11.2026: Gerber mit Ausschnitt unter der Pico-Antenne, zwei Leitungen (GP17, GP21) mit mehr Abstand dazu verlegt, überarbeiteter Bestückungsdruck.
 
 ### English
 
@@ -24,4 +24,4 @@ Erste Veröffentlichung / first public release.
 - **USB keyboard** on a computer (MiSTer, PC/Mac German/US, chosen with CE + F key) and USB console.
 - **Battery operation** with a 4056 charger module, power saving; **C= + F10** types version and power supply.
 - Two firmware files: `cbm2-keyboard_pico2w` (Pico 2 W) and `cbm2-keyboard_rp2040` (YD-RP2040 / Pico 1, cable only; battery voltage through a divider on GP26, no voltage readout on the cable).
-- PCB v1.0 (Gerber, parts list, photos in `hardware/`).
+- PCB v1.0 (Gerber, parts list, photos in `hardware/`). Update 2026-11-07: Gerber with a cut-out under the Pico antenna, two traces (GP17, GP21) rerouted with more clearance to it, reworked silkscreen.

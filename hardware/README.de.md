@@ -5,6 +5,7 @@
 Platine für das **CBM2 Keyboard**: Raspberry Pi **Pico 2 W** oder **YD-RP2040**, der 23-polige
 Stecker der CBM-II-Tastatur, die Buchse für das Kabel zum Pico64 und – wer kabellos will – Platz für
 ein Lademodul und einen LiPo-Akku. 56 × 62 mm, 2 Lagen, 1,6 mm, nur bedrahtete Bauteile.
+Unter der Antenne des Pico 2 W hat die Platine einen Ausschnitt (besserer Funkempfang).
 
 | | |
 |---|---|
