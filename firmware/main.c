@@ -38,8 +38,12 @@
 #endif
 
 #include "kb.h"
+#if KB_C64
+#include "c64_scan.h"
+#else
 #include "cbm2_scan.h"
 #include "c64_map.h"
+#endif
 #include "macro.h"
 #include "ble_link.h"
 #include "usb_kbd.h"
@@ -48,6 +52,19 @@
 #include "wire.h"
 
 #define CBM2_VERSION "0.4.4"
+#define C64KB_VERSION "0.1.0"
+
+#if KB_C64
+// Same PCB and firmware, but an original C64 keyboard on J1 (see c64_scan.c).
+// CTRL + C= + F1 types version and supply voltage, e.g. "c64kb v0.1.0 akku 3.92v 80%".
+#define PRODUCT     "C64 Keyboard"
+#define FW_VERSION  C64KB_VERSION
+#define INFO_PREFIX "c64kb v"
+#else
+#define PRODUCT     "CBM2 Keyboard"
+#define FW_VERSION  CBM2_VERSION
+#define INFO_PREFIX "cbm2 v"
+#endif
 // The timer runs every 1 ms (USB must be served often, also while a computer sets
 // us up). The keyboard is scanned every 1 ms with the cable to the Pico64 or a
 // computer on USB (fast, e.g. for games); otherwise (battery, Bluetooth) every
@@ -66,6 +83,20 @@ static bool key_log = true;
 static char line[32];
 static size_t line_len;
 
+#if KB_C64
+static void log_keys(const kb_state_t *s) {
+    printf("%8lu ms  ", (unsigned long)to_ms_since_boot(get_absolute_time()));
+    int n = 0;
+    for (int c = 0; c < 8; c++)
+        for (int r = 0; r < 8; r++)
+            if (s->cols[c] & (1u << r)) printf("%s%s", n++ ? " + " : "", c64_key_name((uint8_t)(c * 8 + r)));
+    if (s->restore) printf("%sRESTORE", n++ ? " + " : "");
+    if (n == 0) printf("(none)");
+    printf("  -> C64 ");
+    for (int i = 0; i < 8; i++) printf("%02x", s->cols[i]);
+    printf("\n");
+}
+#else
 static void log_keys(const kb_state_t *s) {
     const cbm_keys_t *k = cbm_keys();
     printf("%8lu ms  ", (unsigned long)to_ms_since_boot(get_absolute_time()));
@@ -75,16 +106,17 @@ static void log_keys(const kb_state_t *s) {
     for (int i = 0; i < 8; i++) printf("%02x", s->cols[i]);
     printf("%s\n", s->restore ? " +RESTORE" : "");
 }
+#endif
 
 // typed with C= + F10, e.g. "cbm2 v0.3.1 akku 3.92v 80%"
 static const char *info_text(void) {
     static char buf[48];
-    snprintf(buf, sizeof(buf), "cbm2 v" CBM2_VERSION " %s", battery_text(wire_connected()));
+    snprintf(buf, sizeof(buf), INFO_PREFIX FW_VERSION " %s", battery_text(wire_connected()));
     return buf;
 }
 
 static void status(void) {
-    printf("CBM2 Keyboard v" CBM2_VERSION " (%lu MHz)\n", (unsigned long)(clock_get_hz(clk_sys) / 1000000));
+    printf(PRODUCT " v" FW_VERSION " (%lu MHz)\n", (unsigned long)(clock_get_hz(clk_sys) / 1000000));
     printf("cable to the Pico64: %s\n", wire_connected() ? "plugged in" : "no");
     ble_link_status();
     printf("USB: %s, output %s%s\n", usb_kbd_mounted() ? "connected" : "not connected",
@@ -117,8 +149,10 @@ static void console(void) {
 
 static void tick_body(void) {
     static unsigned n;
+#if !KB_C64
     static uint8_t prev_held[CBM_MAX_HELD];
     static int prev_n;
+#endif
     static kb_state_t last_out;
     static bool was_wire;
 
@@ -145,6 +179,21 @@ static void tick_body(void) {
     uint32_t period = (usb || wire) ? FAST_SCAN_MS : (time_reached(active_until) ? IDLE_MS : ACTIVE_MS);
     if (++n >= period) {
         n = 0;
+#if KB_C64
+        bool changed = c64_scan();
+        if (changed || c64_held_count() > 0 || macro_busy())
+            active_until = make_timeout_time_ms(IDLE_AFTER_MS);
+        kb_state_t s = *c64_keys();
+        if (changed) {
+            // CTRL + C= + F1 (F1 newly pressed): type version and supply voltage
+            static bool prev_f1;
+            bool f1 = kb_held(&s, C_F1);
+            if (f1 && !prev_f1 && kb_held(&s, C_CTRL) && kb_held(&s, C_CMDR) &&
+                macro_start(info_text()) && key_log) printf("macro: info\n");
+            prev_f1 = f1;
+        }
+        if (macro_busy()) macro_tick(&s);
+#else
         bool changed = cbm_scan();
         if (changed || cbm_keys()->n > 0 || macro_busy())
             active_until = make_timeout_time_ms(IDLE_AFTER_MS);
@@ -169,6 +218,7 @@ static void tick_body(void) {
         kb_state_t s;
         if (macro_busy()) macro_tick(&s);
         else              c64_map(cbm_keys(), &s);
+#endif
         if (changed && key_log && !macro_busy()) log_keys(&s);
         if (memcmp(&s, &last_out, sizeof(s)) != 0) {
             last_out = s;
@@ -210,7 +260,11 @@ static void led_tick(btstack_timer_source_t *ts) {
 }
 
 int main(void) {
+#if KB_C64
+    c64_scan_init();
+#else
     cbm_scan_init();
+#endif
     wire_init();
 
     // Wireless chip and Bluetooth first: loading their firmware blocks for a while.
@@ -232,7 +286,7 @@ int main(void) {
 
     usb_kbd_init();              // own USB descriptors: console + keyboard
     stdio_init_all();
-    printf("CBM2 Keyboard v" CBM2_VERSION " starting\n");
+    printf(PRODUCT " v" FW_VERSION " starting\n");
 
     btstack_run_loop_execute();  // does not return
     return 0;
@@ -240,14 +294,18 @@ int main(void) {
 #else
 // RP2040 without radio: cable to the Pico64 and USB only, simple 1 ms main loop
 int main(void) {
+#if KB_C64
+    c64_scan_init();
+#else
     cbm_scan_init();
+#endif
     wire_init();
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
     usb_out_init();
     usb_kbd_init();
     stdio_init_all();
-    printf("CBM2 Keyboard v" CBM2_VERSION " (RP2040, cable only) starting\n");
+    printf(PRODUCT " v" FW_VERSION " (RP2040, cable only) starting\n");
 
     absolute_time_t next_tick = get_absolute_time(), next_led = next_tick;
     for (;;) {

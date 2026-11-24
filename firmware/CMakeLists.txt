@@ -1,5 +1,6 @@
 # CBM2 Keyboard – CBM-II keyboard for the C64 (via Pico64 Keyboard) and as USB keyboard
 # Build: mkdir build && cd build && cmake .. && make -j            (Pico 2 W)
+#        add -DKEYBOARD=c64 for an original C64 keyboard on the same PCB
 #        mkdir build-rp2040 && cd build-rp2040 && cmake -DPICO_BOARD=pico .. && make -j   (RP2040)
 cmake_minimum_required(VERSION 3.13)
 
@@ -10,10 +11,23 @@ project(cbm2_keyboard C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 pico_sdk_init()
 
+# KEYBOARD=cbm2 (default): CBM-II keyboard. KEYBOARD=c64: original C64 keyboard on the
+# same PCB (plug turned round at the end of J1, see c64_scan.c) -> c64_keyboard.uf2
+set(KEYBOARD cbm2 CACHE STRING "cbm2 or c64")
+if(KEYBOARD STREQUAL "c64")
+    set(KB_SCAN c64_scan.c)
+    set(KB_MAP "")
+    set(KB_C64 1)
+else()
+    set(KB_SCAN cbm2_scan.c)
+    set(KB_MAP c64_map.c)
+    set(KB_C64 0)
+endif()
+
 add_executable(cbm2_keyboard
     main.c
-    cbm2_scan.c
-    c64_map.c
+    ${KB_SCAN}
+    ${KB_MAP}
     macro.c
     usb_kbd.c
     usb_out.c
@@ -22,6 +36,10 @@ add_executable(cbm2_keyboard
 )
 
 target_include_directories(cbm2_keyboard PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+target_compile_definitions(cbm2_keyboard PRIVATE KB_C64=${KB_C64})
+if(KB_C64)
+    set_target_properties(cbm2_keyboard PROPERTIES OUTPUT_NAME c64_keyboard)
+endif()
 
 target_link_libraries(cbm2_keyboard
     pico_stdlib

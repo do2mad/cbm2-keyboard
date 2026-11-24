@@ -67,9 +67,17 @@ const uint8_t *tud_descriptor_configuration_cb(uint8_t index) {
 static const char *string_desc[] = {
     NULL,                       // 0: language
     "1mhz.de",                  // 1: manufacturer
+#if KB_C64
+    "C64 Keyboard",             // 2: product
+#else
     "CBM2 Keyboard",            // 2: product
+#endif
     NULL,                       // 3: serial = board id
+#if KB_C64
+    "C64 Keyboard Console",     // 4: CDC
+#else
     "CBM2 Keyboard Console",    // 4: CDC
+#endif
     "CBM-II Keyboard",          // 5: HID
 };
 

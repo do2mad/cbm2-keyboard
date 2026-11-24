@@ -2,6 +2,18 @@
 
 CBM2 Keyboard. Neueste Version zuerst.
 
+## v0.5.0 – 2026-11-24
+
+### Deutsch
+
+- **Neu: C64 Keyboard 0.1.0** – dieselbe Platine mit einer originalen C64-Tastatur (Stecker umgedreht an J1), eigene Firmware `c64-keyboard_pico2w` / `c64-keyboard_rp2040`. Kabel oder Bluetooth zum Pico64, USB-Tastatur (RESTORE + F-Taste), Akku. CTRL + C= + F1 tippt Version und Versorgung. Getestet mit Pico 2 W (Bluetooth, Kabel) und YD-RP2040 (Kabel).
+- CBM2-Firmware unverändert 0.4.4 (liegt dem Release wieder bei). Gleiche Quellen, Bauoption `-DKEYBOARD=c64`.
+
+### English
+
+- **New: C64 Keyboard 0.1.0** – the same PCB with an original C64 keyboard (plug turned round on J1), own firmware `c64-keyboard_pico2w` / `c64-keyboard_rp2040`. Cable or Bluetooth to the Pico64, USB keyboard (RESTORE + F key), battery. CTRL + C= + F1 types version and power supply. Tested with Pico 2 W (Bluetooth, cable) and YD-RP2040 (cable).
+- CBM2 firmware unchanged at 0.4.4 (attached again). Same sources, build option `-DKEYBOARD=c64`.
+
 ## v0.4.4 – 2026-11-07
 
 Erste Veröffentlichung / first public release.

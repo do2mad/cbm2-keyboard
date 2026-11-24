@@ -7,6 +7,7 @@ US/ASCII-Version aus dem 610) am **Commodore 64** – ohne eigenes Kernal und oh
 Ein Raspberry Pi Pico liest die Tastatur aus und schickt die Tasten an einen
 [Pico64 Keyboard](https://github.com/do2mad/pico64-keyboard)-Adapter im C64 – per **Kabel** oder
 **Bluetooth**. An einem Computer arbeitet er zusätzlich als **USB-Tastatur** (MiSTer, PC, Mac).
+Mit anderer Firmware passt auf dieselbe Platine auch eine **originale C64-Tastatur** (siehe unten).
 
 ```
 CBM-II-Tastatur ──22 Leitungen──> Pico ──Kabel (4-pol.) oder Bluetooth──> Pico64 Keyboard im C64
@@ -118,6 +119,34 @@ Die Tasten werden **nach Zeichen** umgesetzt – es kommt an, was auf der Kappe 
 | CTRL / C= + Ziffer | Ziffer bleibt Ziffer (Farben, RVS) |
 | SHIFT, SHIFT LOCK, CTRL, C= | gleich |
 
+## Auch für die C64-Tastatur: C64 Keyboard
+
+Dieselbe Platine nimmt auch eine **originale C64-Tastatur** auf – ohne Umbau, nur mit anderer
+Firmware (`c64-keyboard_pico2w_v….uf2` bzw. `c64-keyboard_rp2040_v….uf2`). So wird die C64-Tastatur
+zur kabellosen Tastatur für einen Pico64 in einem anderen C64, per Kabel oder Bluetooth, oder zur
+USB-Tastatur.
+
+- **Stecker:** den 20-poligen C64-Stecker **umgedreht** an das Ende von J1 stecken – C64-Pin 1 auf
+  J1 Pin 23, der Kodierplatz (C64-Pin 2) auf den Kodierplatz J1 Pin 22. J1 Pin 1–3 bleiben frei.
+- **Wie beim CBM2 Keyboard:** Kabel oder Bluetooth zum Pico64, USB-Tastatur, Akku, Stromsparen, LED.
+- **USB-Ausgabe** wählen mit **RESTORE + F1 / F3 / F5 / F7 / F8** (MiSTer, PC deutsch, PC US,
+  Mac deutsch, Mac US), RESTORE allein = F11 beim MiSTer.
+- **CTRL + C= + F1** tippt Version und Versorgung, z. B. `c64kb v0.1.0 akku 3.92v 80%`.
+- Tasten kommen 1:1 an – Buchstaben wiederholen sich wie beim echten C64 nicht von selbst;
+  `POKE 650,128` schaltet die Wiederholung für alle Tasten ein.
+- Pin 4 des C64-Steckers (+5 V) bleibt unbenutzt. Beleuchtete Ersatztastaturen, die dort 5 V für
+  LEDs brauchen, leuchten nicht.
+
+| C64-Stecker | J1 | Pico |
+|---|---|---|
+| 1 GND | 23 | GP21 (auf Low) |
+| 3 RESTORE | 21 | GP20 |
+| 4 +5 V | 20 | GP19 (unbenutzt) |
+| 13, 19, 18, 17, 16, 15, 14, 20 (PA0–PA7) | 11, 5, 6, 7, 8, 9, 10, 4 | GP10, GP4, GP5, GP6, GP7, GP8, GP9, GP3 |
+| 12, 11, 10, 5, 8, 7, 6, 9 (PB0–PB7) | 12, 13, 14, 19, 16, 17, 18, 15 | GP11, GP12, GP13, GP18, GP15, GP16, GP17, GP14 |
+
+Getestet: Pico 2 W per Bluetooth und per Kabel, YD-RP2040 per Kabel.
+
 ## Firmware aufspielen
 
 Am einfachsten auf der [Flash-Seite](https://1mhz.de/Pico64/) – direkt aus Chrome oder Edge. Oder die
@@ -161,6 +190,8 @@ cmake --build build                    # -> build/cbm2_keyboard.uf2
 cmake -S . -B build-rp2040 -DPICO_BOARD=pico -DPICO_SDK_PATH=/pfad/zu/pico-sdk  # RP2040
 cmake --build build-rp2040
 ```
+
+Für die C64-Tastatur zusätzlich `-DKEYBOARD=c64` angeben (ergibt `c64_keyboard.uf2`).
 
 USB-Kennung: vorerst die Test-Kennung `1209:0001` von pid.codes.
 

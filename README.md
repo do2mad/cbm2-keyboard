@@ -7,6 +7,7 @@ the US/ASCII version from a 610) on a **Commodore 64** – no custom kernal and 
 A Raspberry Pi Pico scans the keyboard and sends the keys to a
 [Pico64 Keyboard](https://github.com/do2mad/pico64-keyboard) adapter inside the C64 – by **cable** or
 **Bluetooth**. On a computer it also works as a **USB keyboard** (MiSTer, PC, Mac).
+With another firmware the same PCB also takes an **original C64 keyboard** (see below).
 
 ```
 CBM-II keyboard ──22 lines──> Pico ──cable (4-pin) or Bluetooth──> Pico64 Keyboard in the C64
@@ -119,6 +120,33 @@ Keys are translated **by character** – you get what is printed on the keycap.
 | CTRL / C= + digit | digit stays a digit (colours, RVS) |
 | SHIFT, SHIFT LOCK, CTRL, C= | same |
 
+## Also for the C64 keyboard: C64 Keyboard
+
+The same PCB also takes an **original C64 keyboard** – no modification, just another firmware
+(`c64-keyboard_pico2w_v….uf2` or `c64-keyboard_rp2040_v….uf2`). This turns the C64 keyboard into a
+wireless keyboard for a Pico64 in another C64, by cable or Bluetooth, or into a USB keyboard.
+
+- **Plug:** put the 20-pin C64 plug **turned round** onto the end of J1 – C64 pin 1 on J1 pin 23,
+  the key position (C64 pin 2) on the key position J1 pin 22. J1 pins 1–3 stay free.
+- **Same as the CBM2 Keyboard:** cable or Bluetooth to the Pico64, USB keyboard, battery, power saving, LED.
+- **USB output** chosen with **RESTORE + F1 / F3 / F5 / F7 / F8** (MiSTer, PC German, PC US,
+  Mac German, Mac US), RESTORE alone = F11 on the MiSTer.
+- **CTRL + C= + F1** types version and power supply, e.g. `c64kb v0.1.0 akku 3.92v 80%`.
+- Keys are passed on 1:1 – like on a real C64, letters do not repeat by themselves;
+  `POKE 650,128` turns on repeat for all keys.
+- Pin 4 of the C64 plug (+5 V) is not used. Backlit replacement keyboards that need 5 V there
+  for their LEDs stay dark.
+
+| C64 plug | J1 | Pico |
+|---|---|---|
+| 1 GND | 23 | GP21 (driven low) |
+| 3 RESTORE | 21 | GP20 |
+| 4 +5 V | 20 | GP19 (not used) |
+| 13, 19, 18, 17, 16, 15, 14, 20 (PA0–PA7) | 11, 5, 6, 7, 8, 9, 10, 4 | GP10, GP4, GP5, GP6, GP7, GP8, GP9, GP3 |
+| 12, 11, 10, 5, 8, 7, 6, 9 (PB0–PB7) | 12, 13, 14, 19, 16, 17, 18, 15 | GP11, GP12, GP13, GP18, GP15, GP16, GP17, GP14 |
+
+Tested: Pico 2 W by Bluetooth and by cable, YD-RP2040 by cable.
+
 ## Installing the firmware
 
 Easiest on the [flash page](https://1mhz.de/Pico64/) – directly from Chrome or Edge. Or download the
@@ -162,6 +190,8 @@ cmake --build build                    # -> build/cbm2_keyboard.uf2
 cmake -S . -B build-rp2040 -DPICO_BOARD=pico -DPICO_SDK_PATH=/path/to/pico-sdk  # RP2040
 cmake --build build-rp2040
 ```
+
+For the C64 keyboard add `-DKEYBOARD=c64` (gives `c64_keyboard.uf2`).
 
 USB ID: for now the pid.codes test ID `1209:0001`.
 
