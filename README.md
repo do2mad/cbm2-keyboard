@@ -147,6 +147,11 @@ wireless keyboard for a Pico64 in another C64, by cable or Bluetooth, or into a 
 
 Tested: Pico 2 W by Bluetooth and by cable, YD-RP2040 by cable.
 
+| | | |
+|---|---|---|
+| ![C64 keyboard with Pico 2 W](hardware/images/c64kb-pico2w.jpg) | ![C64 keyboard with YD-RP2040](hardware/images/c64kb-rp2040.jpg) | ![J1 pins 1–3 free](hardware/images/c64kb-free-pins.jpg) |
+| with Pico 2 W and battery | with YD-RP2040 and battery | J1 pins 1–3 stay free |
+
 ## Installing the firmware
 
 Easiest on the [flash page](https://1mhz.de/Pico64/) – directly from Chrome or Edge. Or download the

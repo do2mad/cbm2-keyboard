@@ -147,6 +147,11 @@ USB-Tastatur.
 
 Getestet: Pico 2 W per Bluetooth und per Kabel, YD-RP2040 per Kabel.
 
+| | | |
+|---|---|---|
+| ![C64-Tastatur mit Pico 2 W](hardware/images/c64kb-pico2w.jpg) | ![C64-Tastatur mit YD-RP2040](hardware/images/c64kb-rp2040.jpg) | ![J1 Pin 1–3 frei](hardware/images/c64kb-free-pins.jpg) |
+| mit Pico 2 W und Akku | mit YD-RP2040 und Akku | J1 Pin 1–3 bleiben frei |
+
 ## Firmware aufspielen
 
 Am einfachsten auf der [Flash-Seite](https://1mhz.de/Pico64/) – direkt aus Chrome oder Edge. Oder die
